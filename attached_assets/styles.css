@@ -1,0 +1,125 @@
+/* Global styles */
+* {
+    font-family: 'Inter', sans-serif;
+    box-sizing: border-box;
+}
+
+/* Title and header styles */
+.title-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: 2rem;
+    background: linear-gradient(135deg, #2b2d42, #8d99ae);
+    padding: 1rem;
+    border-radius: 10px;
+    color: white;
+}
+
+.subheader {
+    color: #2b2d42;
+    margin: 0;
+    padding: 0.5rem 0;
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+/* Stock table styles */
+.stock-table {
+    margin-top: 0 !important;
+}
+
+.stock-table th {
+    font-weight: 700 !important;
+    font-size: 1.1rem !important;
+    color: #2b2d42 !important;
+}
+
+.stock-table td {
+    font-weight: 500 !important;
+    font-size: 1rem !important;
+}
+
+/* Tab styling */
+.stTabs [data-baseweb="tab-list"] {
+    gap: 8px;
+    background-color: #f8f9fa;
+    padding: 0.5rem;
+    border-radius: 10px;
+}
+
+.stTabs [data-baseweb="tab"] {
+    height: 50px;
+    padding: 0 16px;
+    background-color: white;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 1rem;
+    color: #2b2d42;
+    border: 2px solid transparent;
+    transition: all 0.2s ease;
+}
+
+.stTabs [data-baseweb="tab"]:hover {
+    background-color: #e9ecef;
+    border-color: #4361ee;
+}
+
+.stTabs [aria-selected="true"] {
+    background-color: #4361ee !important;
+    color: white !important;
+}
+
+/* Card styles */
+.card {
+    background-color: white;
+    border-radius: 10px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    transition: transform 0.2s;
+}
+
+/* Metric card styles */
+.metric-card {
+    background: linear-gradient(135deg, #4361ee, #3a0ca3);
+    color: white;
+    padding: 1rem;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.metric-value {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-top: 0.5rem;
+}
+
+/* Footer styles */
+.footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: #f8f9fa;
+    padding: 0.5rem;
+    text-align: center;
+    font-size: 0.85rem;
+    color: #6c757d;
+    border-top: 1px solid #dee2e6;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .card {
+        padding: 1rem;
+    }
+
+    .metric-card {
+        margin-bottom: 0.5rem;
+    }
+
+    .title-container {
+        flex-direction: column;
+        text-align: center;
+    }
+}
