@@ -265,8 +265,42 @@ def render_search_filter(db):
 def render_reports(db):
     st.subheader("📈 Reports")
 
+    # Expired items report
+    st.markdown("### 🚫 Expired Items")
+    expired_items = db.get_expired_items()
+    if not expired_items.empty:
+        st.dataframe(
+            expired_items,
+            column_config={
+                "item_name": "Item",
+                "current_stock": st.column_config.NumberColumn("Current Stock", format="%d"),
+                "expiry_date": st.column_config.DateColumn("Expiry Date")
+            },
+            hide_index=True,
+            use_container_width=True
+        )
+    else:
+        st.success("No expired items found.")
+
+    # Near expiry report
+    st.markdown("### ⚠️ Items Near Expiry (Next 60 Days)")
+    near_expiry = db.get_near_expiry_items()
+    if not near_expiry.empty:
+        st.dataframe(
+            near_expiry,
+            column_config={
+                "item_name": "Item",
+                "current_stock": st.column_config.NumberColumn("Current Stock", format="%d"),
+                "expiry_date": st.column_config.DateColumn("Expiry Date")
+            },
+            hide_index=True,
+            use_container_width=True
+        )
+    else:
+        st.success("No items are near expiry.")
+
     # Low stock report
-    st.markdown("### Low Stock Items")
+    st.markdown("### 📉 Low Stock Items")
     low_stock = db.get_low_stock_items()
     if not low_stock.empty:
         st.dataframe(

@@ -303,6 +303,57 @@ class Database:
         """
         return pd.read_sql_query(query, self.conn)
 
+    def get_expired_items(self):
+        query = """
+        WITH current_stock AS (
+            SELECT 
+                item_id,
+                expiry_date,
+                SUM(CASE 
+                    WHEN transaction_type = 'IN' THEN quantity 
+                    ELSE -quantity 
+                END) as stock_level
+            FROM transactions
+            GROUP BY item_id, expiry_date
+            HAVING stock_level > 0
+        )
+        SELECT 
+            i.name as item_name,
+            cs.stock_level as current_stock,
+            cs.expiry_date
+        FROM current_stock cs
+        JOIN items i ON cs.item_id = i.id
+        WHERE cs.expiry_date < date('now')
+        ORDER BY cs.expiry_date DESC
+        """
+        return pd.read_sql_query(query, self.conn)
+
+    def get_near_expiry_items(self):
+        query = """
+        WITH current_stock AS (
+            SELECT 
+                item_id,
+                expiry_date,
+                SUM(CASE 
+                    WHEN transaction_type = 'IN' THEN quantity 
+                    ELSE -quantity 
+                END) as stock_level
+            FROM transactions
+            GROUP BY item_id, expiry_date
+            HAVING stock_level > 0
+        )
+        SELECT 
+            i.name as item_name,
+            cs.stock_level as current_stock,
+            cs.expiry_date
+        FROM current_stock cs
+        JOIN items i ON cs.item_id = i.id
+        WHERE julianday(cs.expiry_date) - julianday('now') <= 60
+            AND cs.expiry_date >= date('now')
+        ORDER BY cs.expiry_date ASC
+        """
+        return pd.read_sql_query(query, self.conn)
+
     def add_user(self, username, password):
         """Add a new user to the database"""
         cursor = self.conn.cursor()

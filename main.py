@@ -53,7 +53,7 @@ st.markdown(
     <div class="title-container">
         <div>
             <h1>🧪 Molbio Reagents Inventory</h1>
-            <p>Track, manage, and analyze your molecular biology reagents inventory</p>
+            <p>Track, Manage, and Analyze the reagents inventory</p>
         </div>
     </div>
     """,
@@ -178,7 +178,7 @@ with tabs[4]:
 st.markdown(
     """
     <div class="footer">
-        <p>© 2024 Molbio Reagents Inventory Management System | Version 1.0 | Designed by Subhadeep.S</p>
+        <p>© 2025 Molbio Reagents Inventory Management System | Version 1.0 | Designed by Subhadeep.S</p>
     </div>
     """,
     unsafe_allow_html=True
