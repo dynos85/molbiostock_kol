@@ -3,6 +3,125 @@ from datetime import datetime
 import pandas as pd
 import os
 
+# Updated Database class with support for retrieving database path
+
+import sqlite3
+import pandas as pd
+import os
+from datetime import datetime
+import hashlib
+
+class Database:
+    """Database class to handle all database operations"""
+    
+    def __init__(self, db_path=None):
+        """Initialize the database connection"""
+        self.db_path = db_path or os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "inventory.db")
+        
+        # Ensure the data directory exists
+        os.makedirs(os.path.dirname(self.db_path), exist_ok=True)
+        
+        # Initialize the database
+        self.conn = sqlite3.connect(self.db_path)
+        self.cursor = self.conn.cursor()
+        
+        # Create tables if they don't exist
+        self._create_tables()
+        
+        # Initialize admin user if not exists
+        self._init_admin_user()
+    
+    def get_db_path(self):
+        """Get the path to the SQLite database file"""
+        return self.db_path
+    
+    def _create_tables(self):
+        """Create necessary tables if they don't exist"""
+        # Users table
+        self.cursor.execute('''
+        CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT UNIQUE NOT NULL,
+            password_hash TEXT NOT NULL,
+            name TEXT,
+            role TEXT DEFAULT 'user',
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+        ''')
+        
+        # Inventory table
+        self.cursor.execute('''
+        CREATE TABLE IF NOT EXISTS inventory (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            reagent_name TEXT NOT NULL,
+            category TEXT,
+            unit TEXT,
+            quantity REAL NOT NULL DEFAULT 0,
+            location TEXT,
+            expiry_date DATE,
+            lot_number TEXT,
+            notes TEXT,
+            last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+        ''')
+        
+        # Transactions table
+        self.cursor.execute('''
+        CREATE TABLE IF NOT EXISTS transactions (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            reagent_id INTEGER NOT NULL,
+            transaction_type TEXT NOT NULL,
+            quantity REAL NOT NULL,
+            date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            batch_number TEXT,
+            expiry_date DATE,
+            user_id TEXT,
+            notes TEXT,
+            FOREIGN KEY (reagent_id) REFERENCES inventory (id)
+        )
+        ''')
+        
+        self.conn.commit()
+    
+    def _init_admin_user(self):
+        """Initialize admin user if not exists"""
+        self.cursor.execute("SELECT * FROM users WHERE username = 'admin'")
+        if not self.cursor.fetchone():
+            # Create admin user with default password 'admin123'
+            password_hash = hashlib.sha256('admin123'.encode()).hexdigest()
+            self.cursor.execute(
+                "INSERT INTO users (username, password_hash, name, role) VALUES (?, ?, ?, ?)",
+                ('admin', password_hash, 'Administrator', 'admin')
+            )
+            self.conn.commit()
+    
+    def verify_user(self, username, password):
+        """Verify user credentials"""
+        password_hash = hashlib.sha256(password.encode()).hexdigest()
+        self.cursor.execute(
+            "SELECT * FROM users WHERE username = ? AND password_hash = ?",
+            (username, password_hash)
+        )
+        return self.cursor.fetchone() is not None
+    
+    def change_password(self, username, current_password, new_password):
+        """Change user password"""
+        if not self.verify_user(username, current_password):
+            return False
+        
+        new_password_hash = hashlib.sha256(new_password.encode()).hexdigest()
+        self.cursor.execute(
+            "UPDATE users SET password_hash = ? WHERE username = ?",
+            (new_password_hash, username)
+        )
+        self.conn.commit()
+        return True
+    
+    # Rest of the database methods remain the same...
+    # ...
+
+
+
 class Database:
     def __init__(self):
         # Ensure database file is in the correct location
